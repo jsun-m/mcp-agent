@@ -1,8 +1,11 @@
-# AG2 ConversableAgent Integration Example
+# AG2 Tools Integration Example
 
-This example demonstrates integrating an AG2 (formerly AutoGen) ConversableAgent into
-MCP Agent as a tool. The AG2 agent acts as a specialist — when the MCP Agent needs to
-solve a math problem, it delegates to the AG2 ConversableAgent and uses its reply.
+This example demonstrates integrating tools from the AG2 (formerly AutoGen) framework
+into MCP Agent. Similar to the LangChain and CrewAI examples, this shows how to reuse
+existing tools from the broader AI ecosystem.
+
+In this example, we use AG2's DuckDuckGo search tool within an MCP Agent workflow.
+No additional API keys are needed beyond OpenAI — DuckDuckGo search is free and keyless.
 
 ## App Setup
 

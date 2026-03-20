@@ -1,14 +1,13 @@
 import asyncio
-import os
 import time
 
 from dotenv import load_dotenv
 
 from mcp_agent.app import MCPApp
 from mcp_agent.agents.agent import Agent
-from mcp_agent.tools.ag2_tool import from_ag2_agent
+from mcp_agent.tools.ag2_tool import from_ag2_tool
 from mcp_agent.workflows.llm.augmented_llm_openai import OpenAIAugmentedLLM
-from autogen import ConversableAgent, LLMConfig
+from autogen.tools.experimental import DuckDuckGoSearchTool
 
 # Load env variables
 load_dotenv()
@@ -20,34 +19,21 @@ async def example_usage():
     async with app.run() as agent_app:
         logger = agent_app.logger
 
-        # Create an AG2 ConversableAgent as a specialist
-        llm_config = LLMConfig(
-            api_type="openai",
-            model="gpt-4o-mini",
-            api_key=os.environ.get("OPENAI_API_KEY"),
-        )
+        # Instantiate AG2 tool
+        search_tool = DuckDuckGoSearchTool()
 
-        with llm_config:
-            math_agent = ConversableAgent(
-                name="math_expert",
-                system_message="You are a math expert. Solve math problems step by step and return the final answer.",
-                human_input_mode="NEVER",
-                description="A math expert agent that can solve mathematical problems.",
-            )
-
-        # Wrap the AG2 agent as a tool for mcp-agent
-        agent = Agent(
-            name="assistant",
-            instruction="You are a helpful assistant. Use the math_expert tool to solve any math problems.",
+        search_agent = Agent(
+            name="search_agent",
+            instruction="""You are a helpful assistant.""",
             server_names=[],
-            functions=[from_ag2_agent(math_agent)],
+            functions=[from_ag2_tool(search_tool)],
         )
 
-        async with agent:
-            llm = await agent.attach_llm(OpenAIAugmentedLLM)
+        async with search_agent:
+            llm = await search_agent.attach_llm(OpenAIAugmentedLLM)
 
             result = await llm.generate_str(
-                message="What is the sum of the first 10 prime numbers?",
+                message="Who is Singapore's current prime minister?",
             )
 
             logger.info(f"Result: {result}")
